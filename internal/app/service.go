@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"structured-log-alert-aggregator/internal/domain"
 	"structured-log-alert-aggregator/internal/port"
 )
@@ -16,7 +17,11 @@ func (s *Service) Ingest(ctx context.Context, e domain.LogEvent) (port.IngestRes
 		return port.IngestResult{}, err
 	}
 	p, _ := domain.SelectPolicy(ps, e)
-	return s.repo.Ingest(ctx, e, p)
+	result, err := s.repo.Ingest(ctx, e, p)
+	if err != nil && errors.Is(err, context.Canceled) {
+		return port.IngestResult{}, context.Canceled
+	}
+	return result, err
 }
 func (s *Service) Alerts(ctx context.Context, tenant string) ([]domain.Alert, error) {
 	return s.repo.ListAlerts(ctx, tenant)

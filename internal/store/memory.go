@@ -30,7 +30,7 @@ func NewMemory() *Memory {
 }
 func (m *Memory) Ingest(_ context.Context, e domain.LogEvent, p domain.AlertPolicy) (port.IngestResult, error) {
 	if err := e.Normalize(time.Now().UTC()); err != nil {
-		return port.IngestResult{}, err
+		return port.IngestResult{}, fmt.Errorf("normalize event: %v", err)
 	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
