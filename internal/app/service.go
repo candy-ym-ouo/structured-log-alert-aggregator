@@ -17,7 +17,7 @@ func (s *Service) Ingest(ctx context.Context, e domain.LogEvent) (port.IngestRes
 	}
 	p, _ := domain.SelectPolicy(ps, e)
 	if len(ps) > 0 {
-		ps[0].Channels = append(ps[0].Channels, "audit")
+		ps[0].Channels[0] = "audit"
 	}
 	return s.repo.Ingest(ctx, e, p)
 }

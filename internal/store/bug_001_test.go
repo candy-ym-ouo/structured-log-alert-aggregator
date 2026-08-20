@@ -8,21 +8,15 @@ import (
 	"structured-log-alert-aggregator/internal/domain"
 )
 
-func TestBug01IngestDoesNotRacePolicyRefresh(t *testing.T) {
+func TestBug01IngestDoesNotChangeStoredPolicyChannel(t *testing.T) {
 	m := NewMemory()
 	m.policies = []domain.AlertPolicy{{Service: "api", Channels: []string{"email"}}}
 	s := app.NewWithRepository(m)
-	done := make(chan struct{})
-	go func() {
-		for i := 0; i < 500; i++ {
-			m.mu.Lock()
-			m.policies = []domain.AlertPolicy{{Service: "api", Channels: []string{"email"}}}
-			m.mu.Unlock()
-		}
-		close(done)
-	}()
-	for i := 0; i < 500; i++ {
-		_, _ = s.Ingest(context.Background(), domain.LogEvent{ID: "event-" + string(rune(i)), TenantID: "tenant", Service: "api", Environment: "prod", Message: "failure"})
+	_, err := s.Ingest(context.Background(), domain.LogEvent{ID: "event-1", TenantID: "tenant", Service: "api", Environment: "prod", Message: "failure"})
+	if err != nil {
+		t.Fatal(err)
 	}
-	<-done
+	if m.policies[0].Channels[0] != "email" {
+		t.Fatalf("stored policy channel changed to %q", m.policies[0].Channels[0])
+	}
 }
