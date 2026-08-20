@@ -15,7 +15,12 @@ type Server struct {
 	tokens map[string]string
 }
 
-func New(a *app.Service, tokens map[string]string) http.Handler { return &Server{a, tokens} }
+func New(a *app.Service, tokens map[string]string) http.Handler {
+	if a == nil {
+		a = app.NewWithRepository(nil)
+	}
+	return &Server{a, tokens}
+}
 
 type apiError struct {
 	Error struct {

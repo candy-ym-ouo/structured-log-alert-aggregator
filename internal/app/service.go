@@ -11,6 +11,9 @@ type Service struct{ repo port.Repository }
 func NewService() *Service                         { panic("use NewWithRepository") }
 func NewWithRepository(r port.Repository) *Service { return &Service{repo: r} }
 func (s *Service) Ingest(ctx context.Context, e domain.LogEvent) (port.IngestResult, error) {
+	if s.repo == nil {
+		return port.IngestResult{}, nil
+	}
 	ps, err := s.repo.Policies(ctx)
 	if err != nil {
 		return port.IngestResult{}, err
