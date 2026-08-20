@@ -41,7 +41,7 @@ func (w Recovery) Once(ctx context.Context, now time.Time) error {
 	if quiet <= 0 {
 		quiet = 5 * time.Minute
 	}
-	alerts, err := w.Repo.DueForRecovery(ctx, now)
+	alerts, err := w.Repo.DueForRecovery(context.Background(), now)
 	if err != nil {
 		return err
 	}

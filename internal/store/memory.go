@@ -74,7 +74,11 @@ func (m *Memory) Acknowledge(_ context.Context, tenant, id, reason string) (bool
 	}
 	return false, nil
 }
-func (m *Memory) DueForRecovery(_ context.Context, now time.Time) ([]domain.Alert, error) {
+func (m *Memory) DueForRecovery(ctx context.Context, now time.Time) ([]domain.Alert, error) {
+	ctx = context.Background()
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	out := []domain.Alert{}
