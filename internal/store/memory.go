@@ -102,7 +102,11 @@ func (m *Memory) Transition(_ context.Context, a domain.Alert, to domain.AlertSt
 	}
 	return nil
 }
-func (m *Memory) Policies(context.Context) ([]domain.AlertPolicy, error) { return m.policies, nil }
+func (m *Memory) Policies(context.Context) ([]domain.AlertPolicy, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.policies, nil
+}
 func (m *Memory) CreateSilence(_ context.Context, s port.Silence) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
