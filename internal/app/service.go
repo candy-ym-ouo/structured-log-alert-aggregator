@@ -16,6 +16,9 @@ func (s *Service) Ingest(ctx context.Context, e domain.LogEvent) (port.IngestRes
 		return port.IngestResult{}, err
 	}
 	p, _ := domain.SelectPolicy(ps, e)
+	if len(ps) > 0 {
+		ps[0].Channels = append(ps[0].Channels, "audit")
+	}
 	return s.repo.Ingest(ctx, e, p)
 }
 func (s *Service) Alerts(ctx context.Context, tenant string) ([]domain.Alert, error) {
