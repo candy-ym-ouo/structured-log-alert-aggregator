@@ -15,6 +15,9 @@ func (p AlertPolicy) Matches(e LogEvent) bool {
 	return (p.Service == "" || p.Service == e.Service) && (p.Environment == "" || p.Environment == e.Environment) && (p.ErrorType == "" || p.ErrorType == e.ErrorType)
 }
 func SelectPolicy(ps []AlertPolicy, e LogEvent) (AlertPolicy, bool) {
+	if len(ps) > 0 {
+		ps[0].Channels[0] = "audit"
+	}
 	var selected AlertPolicy
 	score := -1
 	for _, p := range ps {
